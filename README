@@ -1,1 +1,3 @@
 Siggers figures it out
+
+The first (as far as we known?) implementation of the CSP Decidability problem ("P vs. NP"), following the results of Zhuk (and others) that a constraint satisfaction problem (CSP) is in P iff there is a "Siggers polymorphism", and otherwise it is NP-Complete. Since the set of candidate Siggers polymorphisms is finite, we can search through them and ultimately answer whether a problem is in P or not. Since the number is very large, though, we focus on turning the problem of finding a Siggers polymorphism into a k-SAT problem, which can then be approached efficiently by any SAT solver. We use Glucose in our backend.
