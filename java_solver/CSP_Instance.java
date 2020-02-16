@@ -51,6 +51,7 @@ public class CSP_Instance {
 			
 			vars = args.clone();
 			collapseVars();
+			sortVars();
 		}
 		
 		public InstR(boolean[][] rho, int v1, int v2){
@@ -76,6 +77,7 @@ public class CSP_Instance {
 			}
 			
 			collapseVars();
+			sortVars();
 		}
 
 		//basically "clone", but because it's an inner class, it's a constructor.
@@ -114,6 +116,7 @@ public class CSP_Instance {
 							domain[vars[var]][val] = false;
 							progress = true;
 							progressEver = true;
+							System.out.println("Domain restriction: v"+vars[var]+"!="+val);
 						}
 					}
 				}
@@ -168,6 +171,49 @@ public class CSP_Instance {
 			}
 		}
 		
+		public void intersect(InstR other){
+//			System.out.println("Intersecting "+this+" with "+other);
+			
+			if(other.arity != this.arity){
+				throw new RuntimeException();
+			}
+			if(!Arrays.equals(other.vars, this.vars)){
+				throw new RuntimeException();
+			}
+			
+			for(int i=0; i<k; i++){
+				int[] optA = this.allowed[i];
+				
+				boolean inOther = false;
+				for(int[] optB : other.allowed){
+					if(Arrays.equals(optA, optB)){
+						inOther = true;
+						break;
+					}
+				}
+				
+				if(!inOther){
+					this.allowed = Util.remove(this.allowed, i--);
+					k--;
+				}
+			}
+		}
+		
+		public void sortVars(){
+			int[] origVars = vars.clone();
+			Arrays.sort(vars);
+			
+			int[] varsPerm = new int[arity];
+			for(int i=0; i<arity; i++)
+				varsPerm[i] = Util.find(origVars, vars[i]);
+			
+			for(int p=0; p<k; p++){
+				int[] origOpt = allowed[p].clone();
+				for(int i=0; i<arity; i++)
+					allowed[p][i] = origOpt[varsPerm[i]];
+			}
+		}
+		
 		public boolean supports(int... varsAndVals){
 			if(varsAndVals.length != 2*arity)
 				throw new RuntimeException();
@@ -199,8 +245,19 @@ public class CSP_Instance {
 		}
 	}
 	
-	void addRel(InstR r){
+	InstR addRel(InstR r){
+		//Check for existing relation on the same variables
+		for(InstR r2 : rels){
+			if(Arrays.equals(r2.vars, r.vars)){
+				//They're on the same domain! Intersect.
+				r2.intersect(r);
+				return r2;
+			}
+		}
+		
+		//Nope, it's new, add
 		rels.add(r);
+		return r;
 	}
 	
 	void dump(){
@@ -215,6 +272,19 @@ public class CSP_Instance {
 		System.out.println("Relations:");
 		for(InstR r : rels){
 			System.out.println(r);
+		}
+	}
+	
+	void dumpSolution(){
+		for(int v=0;v<nVars;v++){
+			System.out.print("v"+v+" = ");
+			for(int d=0;d<csp.D;d++){
+				if(domain[v][d]){
+					System.out.print(d);
+					break;
+				}
+			}
+			System.out.println();
 		}
 	}
 	

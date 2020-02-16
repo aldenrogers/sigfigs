@@ -1,5 +1,9 @@
+import java.awt.Color;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -35,6 +39,14 @@ public class CSPEntry extends JPanel {
 			UIManager.setLookAndFeel(com.seaglasslookandfeel.SeaGlassLookAndFeel.class.getCanonicalName());
 		} catch (Exception e) {
 			e.printStackTrace();
+		}
+	}
+	
+	private static void lookSystem() {
+		try { 
+		    UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+		} catch (Exception e) {
+		    e.printStackTrace();
 		}
 	}
 
@@ -102,7 +114,29 @@ public class CSPEntry extends JPanel {
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					loadCSP(preset.problem);
+					button.setSelected(true);
+					
+					button.setMinimumSize(button.getSize());
+					button.setPreferredSize(button.getSize());
+					button.setMaximumSize(button.getSize());
+					
+					java.awt.Insets marg = button.getMargin();
+					marg.left = -10;
+					marg.right = -10;
+					button.setMargin(marg);
+					
+					button.setFont(button.getFont().deriveFont(Font.BOLD));
 				}
+			});
+			button.addFocusListener(new FocusListener(){
+				@Override
+				public void focusGained(FocusEvent e) {}
+				@Override
+				public void focusLost(FocusEvent e) {
+					Font oldFont = button.getFont();
+					button.setFont(oldFont.deriveFont(~Font.BOLD));
+				}
+				
 			});
 			box.add(button);
 		}
@@ -111,7 +145,7 @@ public class CSPEntry extends JPanel {
 
 	public void loadCSP(CSP problem) {
 		domainSize.setValue(problem.D);
-		relations.setRelations(problem.R);
+		relations.setRelations(problem);
 	}
 
 	public CSP buildCSP() {

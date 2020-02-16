@@ -1,29 +1,41 @@
 public class CSP {
 	int D;
+	String[] Dnames;
 	
 	static class Relation {
 		int k, arity;
-		int[][] allowed;	
+		int[][] allowed;
+		String name;
+		
+		public Relation(){};
+		public Relation(String name_){
+			name = name_;
+		}
 	}
 	
 	int numR;
 	Relation[] R;
 	
+	public CSP(){}
+	public CSP(String... Dnames_){
+		Dnames = Dnames_;
+	}
+	
 	public static CSP get2SAT_Neg(){
-		CSP res = new CSP();
+		CSP res = new CSP("F","T");
 		res.D = 2;
 		
-		Relation True = new Relation();
+		Relation True = new Relation("x is true");
 		True.k = 1;
 		True.arity = 1;
 		True.allowed = new int[][]{{1}};
 		
-		Relation Neg = new Relation();
+		Relation Neg = new Relation("x = !y");
 		Neg.k = 2;
 		Neg.arity = 2;
 		Neg.allowed = new int[][]{{0,1},{1,0}};
 		
-		Relation Clause = new Relation();
+		Relation Clause = new Relation("x || y");
 		Clause.k = 3;
 		Clause.arity = 2;
 		Clause.allowed = new int[][]{{1,1},{0,1},{1,0}};
@@ -34,20 +46,20 @@ public class CSP {
 	}
 	
 	public static CSP get2SAT_3(){
-		CSP res = new CSP();
+		CSP res = new CSP("F","T");
 		res.D = 2;
 		
-		Relation PP = new Relation();
+		Relation PP = new Relation("x || y");
 		PP.k = 3;
 		PP.arity = 2;
 		PP.allowed = new int[][]{{1,1},{0,1},{1,0}};
 		
-		Relation PN = new Relation();
+		Relation PN = new Relation("x || !y");
 		PN.k = 3;
 		PN.arity = 2;
 		PN.allowed = new int[][]{{1,0},{0,0},{1,1}};
 		
-		Relation NN = new Relation();
+		Relation NN = new Relation("!x || !y");
 		NN.k = 3;
 		NN.arity = 2;
 		NN.allowed = new int[][]{{0,0},{1,0},{0,1}};
@@ -58,10 +70,10 @@ public class CSP {
 	}
 	
 	public static CSP get3Color(){
-		CSP res = new CSP();
+		CSP res = new CSP("R","G","B");
 		res.D = 3;
 		
-		Relation Edge = new Relation();
+		Relation Edge = new Relation("Edge");
 		Edge.k = 6;
 		Edge.arity = 2;
 		Edge.allowed = new int[][]{{0,1},{0,2},{1,0},{1,2},{2,0},{2,1}};
@@ -75,17 +87,17 @@ public class CSP {
 		CSP res = new CSP();
 		res.D = 2;
 		
-		Relation Edge = new Relation();
+		Relation Edge = new Relation("Edge");
 		Edge.k = 3;
 		Edge.arity = 2;
 		Edge.allowed = new int[][]{{0,0},{0,1},{1,1}};
 		
-		Relation Source = new Relation();
+		Relation Source = new Relation("Source");
 		Source.k = 1;
 		Source.arity = 1;
 		Source.allowed = new int[][]{{1}};
 		
-		Relation Sink = new Relation();
+		Relation Sink = new Relation("Sink");
 		Sink.k = 1;
 		Sink.arity = 1;
 		Sink.allowed = new int[][]{{0}};
@@ -102,7 +114,7 @@ public class CSP {
 	//we could force certain things to be 0/1/2/3, and now it's actually interesting. It turns
 	//out to be in P!
 	public static CSP getJeavonsExample(){
-		CSP res = new CSP();
+		CSP res = new CSP("a","b","c","d");
 		res.D = 4;
 		
 		Relation R = new Relation();
@@ -125,13 +137,13 @@ public class CSP {
 		CSP res = new CSP();
 		res.D = 3;
 		
-		Relation Eq = new Relation();
+		Relation Eq = new Relation("a + b = c (mod 3)");
 		Eq.k = 9;
 		Eq.arity = 3;
 		Eq.allowed = new int[][]{{0,0,0},{0,1,1},{0,2,2},{1,0,1},{1,1,2},{1,2,0},{2,0,2},{2,1,0},{2,2,1}};
 		
-		Relation C0 = new Relation(); C0.k=1; C0.arity=1; C0.allowed = new int[][]{{0}};
-		Relation C1 = new Relation(); C1.k=1; C1.arity=1; C1.allowed = new int[][]{{1}};
+		Relation C0 = new Relation("x=0"); C0.k=1; C0.arity=1; C0.allowed = new int[][]{{0}};
+		Relation C1 = new Relation("x=1"); C1.k=1; C1.arity=1; C1.allowed = new int[][]{{1}};
 		
 		res.R = new Relation[]{Eq, C0, C1};
 		res.numR = res.R.length;

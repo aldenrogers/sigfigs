@@ -13,6 +13,10 @@ public class PSolver {
 		if(!check23Consistency())
 			return false;
 		
+		//Check (for recursive calls) if it's now fully determined.
+		if(isSolved())
+			return true;
+		
 		int linkedResult = checkLinked();
 		if(linkedResult == 1)
 			return true;
@@ -20,25 +24,37 @@ public class PSolver {
 			return false;
 		//else linkedResult == 0. Continue processing
 		
-		//checkFragmentation();
+		if(checkFragmentation())
+			return false;
 		
-		//checkIrreducibility();
+		if(checkIrreducibility())
+			return false;
 		
-//		Universe.reduceBinaryAbsorption(inst);
+		Universe.reduceBinaryAbsorption(inst);
 		
 		Universe.reduceCenter();
 		
 		//Check for polynomially complete clones
+		if(isPolynomiallyComplete())
+			return reduceCompleteClones();
 		
 		//Solve linear system
+		solveLinearSystem();
 		
-		inst.dump();
-		throw new RuntimeException("Not implemented yet");
+//		inst.dump();
+		inst.dumpSolution();
+		return true;
+	}
+
+	public static void main(String[] args) {
+//		CSP_Instance inst = CSP_Instance.get2SAT11();
+//		CSP_Instance inst = CSP_Instance.get2SATSmall();
+		CSP_Instance inst = CSP_Instance.get2SATLoop();
+		new PSolver(inst).solve();
 	}
 	
 	//Take all unary constraints and remove them by reducing domain
 	public void removeUnary(){
-		//for(CSP_Instance.InstR r : inst.rels){
 		for(int ri=0; ri<inst.rels.size(); ri++){
 			CSP_Instance.InstR r = inst.rels.get(ri);
 			if(r.arity == 1){
@@ -56,9 +72,27 @@ public class PSolver {
 		}
 	}
 	
+	public boolean isSolved() {
+		//Check if each variable has domain size 1.
+		for(int var=inst.nVars; var-->0; ){
+			int domainSize = 0;
+			for(int val=inst.csp.D; val-->0; ){
+				if(inst.domain[var][val])
+					domainSize++;
+			}
+			if(domainSize != 1)
+				return false;
+		}
+
+		System.out.println("Instance SOLVED");
+		inst.dumpSolution();
+		return true;
+	}
+	
 	//Provide (2,3)-consistency, as per https://arxiv.org/pdf/1803.07465.pdf, section 3.2
 	//Returns true if successful. Returns false if a contradiction was reached (empty domain)
 	public boolean check23Consistency(){
+		System.out.println("Applying (2,3)-consistency");
 		
 		int N = inst.nVars; int D = inst.csp.D;
 		
@@ -79,7 +113,7 @@ public class PSolver {
 						continue;
 					
 					for(int b=D;b-->0;){
-						if(!inst.domain[i][b])
+						if(!inst.domain[j][b])
 							continue;
 						
 						//We're going to see if they allow (a,b)
@@ -126,9 +160,9 @@ public class PSolver {
 					}
 				}
 				//Create an instance relation using this rho
-				rhos[j][i] = rhos[i][j] = inst.new InstR(rho_domains[i][j], i, j);
+				CSP_Instance.InstR rho_rel = inst.new InstR(rho_domains[i][j], i, j);
 //				System.out.println("On vars "+i+","+j+" found rho = "+Arrays.deepToString(rho_domains[i][j]));
-				inst.addRel(rhos[i][j]);
+				rhos[j][i] = rhos[i][j] = inst.addRel(rho_rel);
 			}
 		}
 		
@@ -145,6 +179,9 @@ public class PSolver {
 					for(int optI=0; optI<rho_ij.allowed.length; optI++){
 						int a = rho_ij.allowed[optI][0];
 						int b = rho_ij.allowed[optI][1];
+						if(i > j){
+							int t=a; a=b; b=t;
+						}
 						
 						//Is (a,b) okay at a level of 3-consistency?
 						boolean isABokay = true;
@@ -272,7 +309,7 @@ public class PSolver {
 				
 				//Oh snap! This instance is not linked! We will now split the instance.
 				CSP_Instance split = createSplitInstance(visited);
-				System.out.println("We split the problem");
+				System.out.println("Unlinked constraint graph; splitting and recursing");
 				//Solve the split instance completely:
 				boolean splitSolution = new PSolver(split).solve();
 				if(splitSolution){
@@ -295,6 +332,52 @@ public class PSolver {
 		return 0;
 	}
 	
+	boolean checkFragmentation(){
+		return false;
+	}
+	
+	boolean checkIrreducibility(){
+		return false;
+	}
+	
+	//Check if the algebra is equivalent to a finite field or if it's complete.
+	boolean isPolynomiallyComplete(){
+		return true;
+	}
+
+	public void solveLinearSystem() {
+		//TODO
+	}
+	
+	boolean reduceCompleteClones(){
+		//This means just setting one variable and recursing.
+		
+		//Find a variable we can fix.
+		for(int setVar=0; true; setVar++){
+			//Check if this variable has domain > 1.
+			int setVal=-1;
+			int domainSize=0;
+			for(int val=inst.csp.D; val-->0;){
+				if(inst.domain[setVar][val]){
+					setVal = val;
+					domainSize++;
+				}
+			}
+			
+			if(domainSize > 1){
+				//Okay! We'll set this and recurse.
+				for(int val=inst.csp.D; val-->0;){
+					if(val != setVal)
+						inst.domain[setVar][val] = false;
+				}
+				//We forced by restricting the domain.
+				System.out.println("Polynomially complete clone: v"+setVar+" = "+setVal);
+				//Solve.
+				return solve();
+			}
+		}
+	}
+	
 	//Given the connected component, create a new instance of just that linked
 	//instance. Remove it from this instance.
 	CSP_Instance createSplitInstance(boolean[][] component){
@@ -312,13 +395,6 @@ public class PSolver {
 		}
 		
 		return res;
-	}
-	
-	public static void main(String[] args) {
-//		CSP_Instance inst = CSP_Instance.get2SAT11();
-//		CSP_Instance inst = CSP_Instance.get2SATSmall();
-		CSP_Instance inst = CSP_Instance.get2SATLoop();
-		new PSolver(inst).solve();
 	}
 
 }
