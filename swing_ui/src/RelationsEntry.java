@@ -4,6 +4,7 @@ import javax.swing.JTextArea;
 
 public class RelationsEntry extends JPanel {
 	private JTextArea text;
+	
 	public RelationsEntry() {
 		add(new JLabel("Relations: "));
 		add(text = new JTextArea(5, 40));
@@ -31,5 +32,19 @@ public class RelationsEntry extends JPanel {
 			relations[i] = parseRelation(lines[i]);
 		}
 		return relations;
+	}
+	
+	public void setRelations(CSP.Relation[] relations) {
+		StringBuilder sb = new StringBuilder();
+		for (CSP.Relation r : relations) {
+			for (int[] clause : r.allowed) {
+				for (int e : clause) {
+					sb.append(e);
+				}
+				sb.append(',');
+			}
+			sb.append('\n');
+		}
+		text.setText(sb.toString());
 	}
 }

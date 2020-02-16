@@ -46,6 +46,11 @@ public class CSPEntry extends JPanel {
 		return pan;
 	}
 	
+	public void loadCSP(CSP problem) {
+		domainSize.setValue(problem.D);
+		relations.setRelations(problem.R);
+	}
+	
 	public CSP buildCSP() {
 		CSP problem = new CSP();
 		problem.D = (Integer) domainSize.getValue();
