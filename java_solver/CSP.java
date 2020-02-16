@@ -119,4 +119,22 @@ public class CSP {
 		res.numR = res.R.length;
 		return res;
 	}
+	
+	//Linear equations mod 3
+	public static CSP getLIN3(){
+		CSP res = new CSP();
+		res.D = 3;
+		
+		Relation Eq = new Relation();
+		Eq.k = 9;
+		Eq.arity = 3;
+		Eq.allowed = new int[][]{{0,0,0},{0,1,1},{0,2,2},{1,0,1},{1,1,2},{1,2,0},{2,0,2},{2,1,0},{2,2,1}};
+		
+		Relation C0 = new Relation(); C0.k=1; C0.arity=1; C0.allowed = new int[][]{{0}};
+		Relation C1 = new Relation(); C1.k=1; C1.arity=1; C1.allowed = new int[][]{{1}};
+		
+		res.R = new Relation[]{Eq, C0, C1};
+		res.numR = res.R.length;
+		return res;
+	}
 }

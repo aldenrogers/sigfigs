@@ -1,5 +1,7 @@
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.util.ArrayList;
 
 import javax.swing.Box;
 import javax.swing.JButton;
@@ -9,6 +11,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.UnsupportedLookAndFeelException;
@@ -47,6 +50,8 @@ public class CSPEntry extends JPanel {
 	private JSpinner domainSize;
 	private RelationsEntry relations;
 	private JButton run;
+	private JLabel result;
+	private Box box;
 
 	private JComponent makeDomainEditor() {
 		JPanel pan = new JPanel();
@@ -75,7 +80,8 @@ public class CSPEntry extends JPanel {
 			new NamedCSP("2-SAT", CSP.get2SAT_Neg()),
 			new NamedCSP("3-coloring", CSP.get3Color()),
 			new NamedCSP("Digraph connectivity", CSP.getDigraphConnected()),
-			new NamedCSP("Jeavon's example", CSP.getJeavonsExample())
+			new NamedCSP("Jeavons' example", CSP.getJeavonsExample()),
+			new NamedCSP("Algebra Mod-3", CSP.getLIN3())
 	};
 	
 	private JComponent makePresets() {
@@ -115,18 +121,51 @@ public class CSPEntry extends JPanel {
 		problem.numR = problem.R.length;
 		return problem;
 	}
+	
+	private String color(String text, String color){
+		return "<html><div style='color: "+ color+ ";'>"+ text + "</div></html>";
+	}
 
 	private void run() {
-		// TODO: build the CSP and classify it. Display result somehow
+		result.setText(color("Searching for Siggers polymorphism...","#AAAA00"));
+//		box.pack();
+		
+		new Thread(){public void run(){
+			SiggersToCNF writer = new SiggersToCNF();
+			writer.writeProblem(buildCSP());
+			
+			//Solve the CNF to find (or fail) the Siggers formula
+			String solString;
+			try {
+				solString = new Glucose(writer).getSolution(true);
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
+			
+			if(solString == null){
+				result.setText(color("Proved NP-Complete! This problem is hard!","#CC0000"));
+				return;
+			}
+			
+			ArrayList<Integer> trues = Glucose.solutionVars(solString);
+			writer.describe(trues);
+			SiggersPoly sigger = writer.getSiggers(trues);
+			result.setText(color("Found Siggers polymorphism.\n Code to efficiently solve this problem has been generated.","#00CC00"));
+			return;
+		}}.start();
 	}
 
 	public CSPEntry() {
-		Box b = Box.createVerticalBox();
-		b.add(makePresets());
-		b.add(makeDomainEditor());
-		b.add(relations = new RelationsEntry());
-		b.add(run = new JButton("Run"));
-		add(b);
+		box = Box.createVerticalBox();
+		box.add(makePresets());
+		box.add(makeDomainEditor());
+		box.add(relations = new RelationsEntry());
+		box.add(run = new JButton("Run"));
+		
+		JPanel resPan = new JPanel();
+		resPan.add(result = new JLabel("Waiting for problem input", SwingConstants.LEFT));
+		box.add(resPan);
+		add(box);
 
 		run.addActionListener(new ActionListener() {
 			@Override
