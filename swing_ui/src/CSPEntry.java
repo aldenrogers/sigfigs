@@ -46,11 +46,16 @@ public class CSPEntry extends JPanel {
 		return pan;
 	}
 	
-	private void run() {
+	public CSP buildCSP() {
 		CSP problem = new CSP();
 		problem.D = (Integer) domainSize.getValue();
 		problem.R = relations.getRelations();
 		problem.numR = problem.R.length;
+		return problem;
+	}
+	
+	private void run() {
+		
 	}
 
 	public CSPEntry() {
