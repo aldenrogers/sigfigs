@@ -44,8 +44,10 @@ public class RelationsEntry extends JPanel {
 				}
 				sb.append(',');
 			}
+			sb.deleteCharAt(sb.length() - 1);
 			sb.append('\n');
 		}
+		sb.deleteCharAt(sb.length() - 1);
 		text.setText(sb.toString());
 	}
 	
