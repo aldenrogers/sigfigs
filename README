@@ -3,3 +3,5 @@ Sara Fish, Alex Meiburg, Alden Rogers
 Treehacks 2020 project -- 2/14/20 - 2/16/20
 
 Abstract: The first (to the best of our knowledge) implementation of the CSP Decidability problem ("P vs. NP"), following the results of Zhuk et al. that a constraint satisfaction problem (CSP) is in P iff there is a "Siggers polymorphism", and otherwise it is NP-Complete. Since the set of candidate Siggers polymorphisms is finite, we can search through them and ultimately answer whether a problem is in P or not. Since the number is very large, though, we focus on turning the problem of finding a Siggers polymorphism into a k-SAT problem, which can then be approached efficiently by any SAT solver. We use Glucose in our backend.
+
+Devpost writeup at https://devpost.com/software/solving-p-vs-np-implementing-zhuk-s-csp-dichotomy-algorithm
