@@ -52,10 +52,10 @@ public class Main {
 
 	public Main() throws IOException{
 		//Choose problem
-		//csp = CSP.get2SAT();
-		//csp = CSP.get3Color();
+		//csp = CSP.get2SAT_Neg();
+		csp = CSP.get3Color();
 		//csp = CSP.getDigraphConnected();
-		csp = CSP.getJeavonsExample();
+		//csp = CSP.getJeavonsExample();
 		
 		//Create Siggers CNF formula
 		writer = new SiggersToCNF();
