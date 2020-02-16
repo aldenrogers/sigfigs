@@ -1,10 +1,8 @@
 import java.util.ArrayList;
 
-public class SiggersToCNF {
+public class SiggersToCNF extends CNFWriter {
 	CSP csp;
 	int D;
-	ArrayList<String> clauses = new ArrayList<String>();
-	int nVars = 0;
 	
 	public void writeProblem(CSP csp_){
 		csp = csp_;
