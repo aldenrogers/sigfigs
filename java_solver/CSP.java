@@ -9,7 +9,7 @@ public class CSP {
 	int numR;
 	Relation[] R;
 	
-	public static CSP get2SAT(){
+	public static CSP get2SAT_Neg(){
 		CSP res = new CSP();
 		res.D = 2;
 		
@@ -29,6 +29,30 @@ public class CSP {
 		Clause.allowed = new int[][]{{1,1},{0,1},{1,0}};
 		
 		res.R = new Relation[]{True,Neg,Clause};
+		res.numR = res.R.length;
+		return res;
+	}
+	
+	public static CSP get2SAT_3(){
+		CSP res = new CSP();
+		res.D = 2;
+		
+		Relation PP = new Relation();
+		PP.k = 3;
+		PP.arity = 2;
+		PP.allowed = new int[][]{{1,1},{0,1},{1,0}};
+		
+		Relation PN = new Relation();
+		PN.k = 3;
+		PN.arity = 2;
+		PN.allowed = new int[][]{{1,0},{0,0},{1,1}};
+		
+		Relation NN = new Relation();
+		NN.k = 3;
+		NN.arity = 2;
+		NN.allowed = new int[][]{{0,0},{1,0},{0,1}};
+		
+		res.R = new Relation[]{PP, PN, NN};
 		res.numR = res.R.length;
 		return res;
 	}

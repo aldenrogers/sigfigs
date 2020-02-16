@@ -184,7 +184,7 @@ public class SiggersToCNF {
 	}
 	
 	public static void main(String[] args){
-		CSP csp = CSP.get2SAT();
+		CSP csp = CSP.get2SAT_Neg();
 		SiggersToCNF writer = new SiggersToCNF();
 		writer.writeProblem(csp);
 		writer.clauses.stream().forEach(System.out::println);
