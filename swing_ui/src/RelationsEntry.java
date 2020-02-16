@@ -1,5 +1,6 @@
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
 public class RelationsEntry extends JPanel {
@@ -7,7 +8,7 @@ public class RelationsEntry extends JPanel {
 	
 	public RelationsEntry() {
 		add(new JLabel("Relations: "));
-		add(text = new JTextArea(5, 40));
+		add(new JScrollPane(text = new JTextArea(5, 40)));
 		text.setLineWrap(true);
 	}
 	
@@ -46,5 +47,9 @@ public class RelationsEntry extends JPanel {
 			sb.append('\n');
 		}
 		text.setText(sb.toString());
+	}
+	
+	public void clear() {
+		text.setText("");
 	}
 }
